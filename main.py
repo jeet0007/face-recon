@@ -7,23 +7,29 @@ def load_known_faces(known_faces_dir):
     known_face_encodings = []
     known_face_names = []
 
-    for person_name in os.listdir(known_faces_dir):
-        person_dir = os.path.join(known_faces_dir, person_name)
-        if os.path.isdir(person_dir):
-            person_image_filenames = [
-                filename for filename in os.listdir(person_dir)
-                if filename.endswith(".jpg") or filename.endswith(".png")
-            ]
-            for filename in person_image_filenames:
-                print(f"Loading {person_name}/{filename}")
-                image_path = os.path.join(person_dir, filename)
-                image = face_recognition.load_image_file(image_path)
-                encoding = face_recognition.face_encodings(image)[0]
-                known_face_encodings.append(encoding)
-                known_face_names.append(person_name)
-                print(f"Loaded {person_name}/{filename}")
+    try:
+        for person_name in os.listdir(known_faces_dir):
+            person_dir = os.path.join(known_faces_dir, person_name)
+            if os.path.isdir(person_dir):
+                person_image_filenames = [
+                    filename for filename in os.listdir(person_dir)
+                    if filename.endswith(".jpg") or filename.endswith(".png")
+                ]
+                for filename in person_image_filenames:
+                    image_path = os.path.join(person_dir, filename)
+                    try:
+                        image = face_recognition.load_image_file(image_path)
+                        encoding = face_recognition.face_encodings(image)
+                        if len(encoding) > 0:
+                            known_face_encodings.append(encoding[0])
+                            known_face_names.append(person_name)
+                    except Exception as e:
+                        print(f"Error loading encoding for {image_path}: {e}")
+    except Exception as e:
+        print(f"Error loading known faces: {e}")
 
     return known_face_encodings, known_face_names
+
 
 
 def add_new_person(camera, known_faces_dir, known_face_names):
