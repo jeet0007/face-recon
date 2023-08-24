@@ -1,0 +1,9 @@
+add faces here with structure
+NAME/ 
+    image_0.jpg
+    image_1.jpg
+
+the stricture will be
+face/
+  Name/ 
+     ... images
