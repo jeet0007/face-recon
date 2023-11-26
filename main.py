@@ -44,29 +44,30 @@ def add_new_person(camera, known_faces_dir, known_face_names):
     if not os.path.exists(person_dir):
         os.makedirs(person_dir)
     num_photos = 0
-
-    while num_photos < 5:
+    number_of_photos = 100
+    # number of known people the number of dir in face folder
+    known_people = len(os.listdir(known_faces_dir)) - 3
+    while num_photos < number_of_photos:
         ret, frame = camera.read()
         if ret:
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             face_cascade = cv2.CascadeClassifier(
                 cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
             faces = face_cascade.detectMultiScale(
-                gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+                gray, scaleFactor=1.2, minNeighbors=5, minSize=(40, 40))
 
             for (x, y, w, h) in faces:
                 if w > 200 and h > 200:  # Check if face size is not too small
                     face = frame[y:y+h, x:x+w]
                     if face.shape[0] > 0 and face.shape[1] > 0:
                         cv2.imshow('Capture Face', face)
-                        if cv2.waitKey(1) & 0xFF == ord('c'):
-                            face_path = os.path.join(
-                                person_dir, f"{name}_{num_photos}.jpg")
-                            cv2.imwrite(face_path, face)
-                            num_photos += 1
-                            print(f"Saved {num_photos} photo(s) for {name}")
-
+                        face_path = os.path.join(
+                            person_dir, f"{name}.{known_people}.{num_photos}.jpg")
+                        cv2.imwrite(face_path, face)
+                        num_photos += 1
+                        print(f"Saved {num_photos} photo(s) for {name}")
     cv2.destroyAllWindows()
+    return True
 
 
 def recognize_face(frame, known_face_encodings, known_face_names):
@@ -74,7 +75,7 @@ def recognize_face(frame, known_face_encodings, known_face_names):
     face_cascade = cv2.CascadeClassifier(
         cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
     faces = face_cascade.detectMultiScale(
-        gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+        gray, scaleFactor=1.2, minNeighbors=5, minSize=(30, 30))
 
     for (x, y, w, h) in faces:
         face = frame[y:y+h, x:x+w]
